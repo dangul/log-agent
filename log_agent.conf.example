@@ -1,0 +1,146 @@
+# ============================================================================
+# log_agent.py - Full configuration (PROTECT WITH chmod 600, root)
+# ============================================================================
+# Rename this file to "log_agent.conf" and fill in your own values.
+# This is the ONLY configuration file for log_agent.py. ALL variables live
+# here, including the API keys. log_agent.py reads this file on every run.
+#
+# Format: one key per line, "KEY=value" (quotes are optional).
+# Lines starting with '#' are comments.
+#
+# Values that are valid JSON are parsed automatically by the script:
+#   - true / false                  -> boolean value (write without quotes)
+#   - 123                           -> integer
+#   - "text with \n line break"     -> text with escape sequences decoded
+#   - { ... } or [ ... ]            -> structure (may span multiple lines,
+#                                      e.g. LOG_SOURCES below)
+# Anything else is treated as plain text.
+
+# ============================================================================
+# GENERAL SETTINGS
+# ============================================================================
+
+# Set to false to only log actual events, warnings, and errors.
+DEBUG_MODE=true
+
+# ============================================================================
+# PUSHOVER API (notifications)
+# ============================================================================
+
+# Application token from pushover.net
+PUSHOVER_TOKEN=""
+
+# User key from pushover.net
+PUSHOVER_USER=""
+
+# Pushover API endpoint (normally does not need to change)
+PUSHOVER_URL="https://api.pushover.net/1/messages.json"
+
+# ============================================================================
+# AI RUNTIME (log analysis)
+# ============================================================================
+# AI_PROVIDER selects the AI used to summarise the matched log lines:
+#   mammouth           Mammouth AI (default, current behaviour)
+#   openai             ChatGPT / OpenAI
+#   anthropic          Claude
+#   openai-compatible  anything else that speaks the OpenAI chat/completions
+#                      format (OpenRouter, DeepSeek, Groq, Mistral, Ollama,
+#                      LM Studio, ...); requires AI_BASE_URL below
+#
+# AI_BASE_URL is optional; when empty the default endpoint for the chosen
+# provider is used:
+#   mammouth -> https://api.mammouth.ai/v1
+#   openai   -> https://api.openai.com/v1
+#   anthropic-> https://api.anthropic.com/v1
+# Local example (Ollama): AI_BASE_URL="http://localhost:11434/v1"
+#
+# The legacy keys MAMMOUTH_API_KEY / MAMMOUTH_URL / MODEL_NAME still work as
+# fallbacks (provider "mammouth") when the matching AI_* key is absent.
+
+# AI provider: mammouth | openai | anthropic | openai-compatible
+AI_PROVIDER=mammouth
+
+# Model ID offered by the provider, e.g. "gpt-4.1", "gpt-4o-mini",
+# "claude-sonnet-4-20250514", "deepseek-chat" or "llama3"
+AI_MODEL=gpt-4.1
+
+# API key for the provider
+AI_API_KEY=""
+
+# Optional: override the API base URL (defaults listed above)
+AI_BASE_URL=""
+
+# Maximum number of tokens in the AI answer
+AI_MAX_TOKENS=300
+
+# ============================================================================
+# LOG SOURCES AND FILTERS
+# ============================================================================
+# Kernel messages are already included in syslog, so kern.log is intentionally
+# not read separately. Regex patterns containing a backslash must be written
+# with a double backslash (\\), because the value is parsed as JSON.
+LOG_SOURCES={
+  "/var/log/syslog": {
+    "patterns": [
+      "\\berror\\b",
+      "\\bcritical\\b",
+      "\\bsevere\\b",
+      "\\bpanic\\b",
+      "\\bunauthorized\\b",
+      "\\bfailed\\b",
+      "\\bfailure\\b",
+      "segfault",
+      "out of memory",
+      "oom-killer",
+      "i/o error",
+      "read-only file system"
+    ],
+    "exclude_patterns": [
+      "networkd-dispatcher"
+    ]
+  },
+  "/var/log/auth.log": {
+    "patterns": [
+      "failed password",
+      "invalid user",
+      "authentication failure",
+      "pam_unix\\([^)]*:auth\\):",
+      "maximum authentication attempts",
+      "connection closed by authenticating user",
+      "accepted password",
+      "accepted publickey",
+      "sudo:.*authentication failure",
+      "sudo:.*incorrect password",
+      "useradd(?:\\[|:)",
+      "userdel(?:\\[|:)",
+      "usermod(?:\\[|:)",
+      "groupadd(?:\\[|:)",
+      "groupdel(?:\\[|:)",
+      "passwd(?:\\[|:).*password changed"
+    ],
+    "exclude_patterns": []
+  }
+}
+
+# ============================================================================
+# REPORTS
+# ============================================================================
+
+# How many days a report is kept before it is deleted.
+REPORT_RETENTION_DAYS=90
+
+# Maximum number of saved reports (oldest are pruned first).
+MAX_SAVED_REPORTS=200
+
+# ============================================================================
+# LOGGING
+# ============================================================================
+
+# Diagnostic log written by the script itself.
+LOG_FILE="/var/log/log_agent.log"
+
+# ============================================================================
+# AI SYSTEM PROMPT
+# ============================================================================
+
+SYSTEM_PROMPT="You are a Linux and security expert. Here are relevant lines from the server's system and authentication logs. Briefly summarise in English what has happened, what the main problems are, and whether anything requires immediate action. Keep the answer short and concise."

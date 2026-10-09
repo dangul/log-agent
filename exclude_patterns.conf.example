@@ -1,0 +1,30 @@
+# ============================================================================
+# log_agent.py - Exclude patterns (silence log lines)
+# ============================================================================
+# Lines in this file are filtered out: they trigger neither an AI analysis
+# nor a Pushover alert. The file is re-read on every run - no restart needed.
+#
+# Format:
+#   - One regex per line, case-insensitive.
+#   - Lines starting with '#' are comments. Blank lines are ignored.
+#   - A pattern without a prefix applies to ALL log sources.
+#   - A prefix 'source:' limits the pattern to one source. The source name is
+#     the file name without the path, e.g. 'syslog' or 'auth.log'.
+#   - The prefix '*:' means all sources (same as no prefix).
+#
+# Examples:
+#
+#   # Silence all lines containing 'networkd-dispatcher' in any source:
+#   networkd-dispatcher
+#
+#   # Silence only in auth.log:
+#   auth.log:^sudo:.*incorrect password
+#
+#   # Silence a specific service in syslog (note that ':' works in a regex):
+#   syslog:^kernel:.*\[nfc\]
+# ============================================================================
+
+# Own root logins (sshd) via "Accepted publickey" from 192.0.2.10.
+# Silence only in auth.log, where the "accepted publickey" pattern triggers.
+auth.log:Accepted publickey for root from 192.0.2.10
+auth.log:Accepted publickey for root from 192.0.2.159

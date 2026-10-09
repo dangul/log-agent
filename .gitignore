@@ -1,0 +1,8 @@
+# Runtime state and private data - never commit
+log_agent.conf
+exclude_patterns.conf
+log_agent.pos
+reports/
+__pycache__/
+*.pyc
+*.log
