@@ -108,6 +108,23 @@ Format: one regex per line (`#` = comment). Prefix a pattern with
 
 ## Tests
 
+`test_log_agent.py` is a regression test suite for `log_agent.py` (19 tests).
+It verifies the script's core behaviour without touching real services: all
+AI and Pushover calls are mocked, so no API keys, network traffic or
+notifications are needed to run it.
+
 ```sh
 python3 test_log_agent.py
 ```
+
+Coverage includes:
+
+- **Config parsing** — `KEY=value` syntax with comments, quotes, numbers and
+  booleans, multi-line JSON values (`LOG_SOURCES`) and escaped newlines.
+- **Exclude patterns** — global vs `source:`-scoped rules in
+  `exclude_patterns.conf`, missing-file handling and end-to-end filtering.
+- **Report storage** — sortable/file-safe report IDs, saved reports with the
+  full message history and correct permissions (`700` directory, `600` file).
+- **AI providers** — key precedence (`AI_*` over legacy `MAMMOUTH_*`),
+  built-in base-URL defaults, OpenAI-compatible and Anthropic request
+  building, provider dispatch and error handling.
