@@ -56,6 +56,25 @@ notification, and saves a timestamped JSON report for later review.
    daily report: a Pushover alert with the AI summary if critical lines were
    found, or an "All OK" notification if the monitored logs were clean.
 
+6. The script writes a diagnostic log to `LOG_FILE` (`/var/log/log_agent.log`
+   by default). This file grows forever unless it is rotated, so add a
+   logrotate config, e.g. `/etc/logrotate.d/log-agent`:
+
+   ```sh
+   /var/log/log_agent.log {
+       weekly
+       rotate 4
+       compress
+       missingok
+       notifempty
+       copytruncate
+   }
+   ```
+
+   The script opens the log file on every run and does not hold it open
+   between runs; `copytruncate` keeps writes safe even if a run happens to
+   overlap a rotation. Adjust the schedule and retention to your needs.
+
 ## Configuration reference
 
 All settings live in a single `log_agent.conf` (one `KEY=value` per line;
