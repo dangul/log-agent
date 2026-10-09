@@ -1,0 +1,69 @@
+name: Bug report
+description: Report a problem or unexpected behaviour in log-agent
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can the problem be reproduced?
+      placeholder: |
+        1. Configure ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: AI provider
+      description: Which AI_PROVIDER are you using?
+      options:
+        - mammouth
+        - openai
+        - anthropic
+        - openai-compatible
+        - N/A (does not involve the AI)
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      description: Output of `python3 --version`
+      placeholder: "3.11.4"
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: e.g. Debian 12, Ubuntu 24.04
+      placeholder: "Debian 12"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: |
+        Paste the relevant lines from /var/log/log_agent.log or the error
+        message. Remove any personal/secret data (API keys, tokens, IPs).
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have removed all sensitive data (API keys, tokens, IP addresses) from the report
+          required: true
+        - label: I have searched the existing issues and this is not a duplicate
+          required: true

@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest an idea or improvement for log-agent
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem does this feature solve, or what would you like to achieve?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe how you would like it to work.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: What alternatives have you considered?
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Which part of log-agent is this about?
+      options:
+        - Log scanning / patterns
+        - Exclude patterns
+        - AI analysis (providers, prompts)
+        - Pushover notifications
+        - Reports / storage
+        - Configuration / setup
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have searched the existing issues and this is not a duplicate
+          required: true
