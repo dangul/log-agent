@@ -13,6 +13,8 @@ notification, and saves a timestamped JSON report for later review.
 - Sends a Pushover alert with an AI-generated summary when critical lines
   are found, or an "All OK" notification when nothing was detected.
 - Saves a JSON report per alert with retention and pruning.
+- `--cli` flag for manual runs: prints the notification to the terminal
+  instead of sending it to Pushover (Pushover keys then not required).
 - Configurable AI backend: Mammouth, OpenAI, Claude (Anthropic) or any
   OpenAI-compatible endpoint (OpenRouter, DeepSeek, Groq, Mistral, Ollama,
   LM Studio, ...).
@@ -75,6 +77,17 @@ notification, and saves a timestamped JSON report for later review.
    between runs; `copytruncate` keeps writes safe even if a run happens to
    overlap a rotation. Adjust the schedule and retention to your needs.
 
+### Running manually
+
+Use the `--cli` flag to run the script by hand: the AI analysis and the JSON
+report are still produced, but the notification is printed to the terminal
+instead of being sent to Pushover. Only `AI_API_KEY` must be set in
+`log_agent.conf` — the Pushover credentials are not required in this mode.
+
+```sh
+sudo python3 log_agent.py --cli
+```
+
 ## Configuration reference
 
 All settings live in a single `log_agent.conf` (one `KEY=value` per line;
@@ -135,7 +148,7 @@ Format: one regex per line (`#` = comment). Prefix a pattern with
 
 ## Tests
 
-`test_log_agent.py` is a regression test suite for `log_agent.py` (19 tests).
+`test_log_agent.py` is a regression test suite for `log_agent.py` (21 tests).
 It verifies the script's core behaviour without touching real services: all
 AI and Pushover calls are mocked, so no API keys, network traffic or
 notifications are needed to run it.
@@ -155,3 +168,5 @@ Coverage includes:
 - **AI providers** — key precedence (`AI_*` over legacy `MAMMOUTH_*`),
   built-in base-URL defaults, OpenAI-compatible and Anthropic request
   building, provider dispatch and error handling.
+- **Pushover notifications** — `--cli` mode prints the notification to stdout
+  without calling the API; normal mode posts the correct payload.

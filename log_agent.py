@@ -9,6 +9,7 @@ import tempfile
 from datetime import datetime, timezone
 import requests
 import logging
+import argparse
 
 # ==============================================================================
 # CONFIGURATION
@@ -598,10 +599,19 @@ def save_report(raw_log_lines, messages, ai_summary, matched_line_count,
             os.remove(temporary_path)
 
 
-def send_pushover(title, message, priority=0):
+def send_pushover(title, message, priority=0, cli_mode=False):
+    notification_title = f"{title} [{SERVER_NAME}]"
+    if cli_mode:
+        # Manual run (--cli): print the notification to the terminal instead of
+        # sending it to Pushover, so the script can be run by hand and the
+        # Pushover credentials are not required.
+        print(f"--- {notification_title} (priority {priority}) ---")
+        print(str(message))
+        logging.info("CLI mode: notification printed to stdout instead of sending to Pushover.")
+        return
+
     token = PUSHOVER_TOKEN.strip()
     user = PUSHOVER_USER.strip()
-    notification_title = f"{title} [{SERVER_NAME}]"
     
     payload = {
         "token": token,
@@ -627,10 +637,29 @@ def send_pushover(title, message, priority=0):
         logging.error(f"Could not send to Pushover: {str(e)}")
 
 if __name__ == "__main__":
-    if not (PUSHOVER_TOKEN and PUSHOVER_USER and AI_API_KEY):
+    parser = argparse.ArgumentParser(
+        description="Scan configured log files, let the AI summarise new "
+        "critical lines and send a Pushover notification."
+    )
+    parser.add_argument(
+        "--cli",
+        action="store_true",
+        help="Do not send Pushover notifications; print them to the terminal "
+        "instead. Intended for manual runs (Pushover keys are then not "
+        "required).",
+    )
+    args = parser.parse_args()
+
+    if not AI_API_KEY:
         logging.error(
-            f"API keys missing. Fill in {CONFIG_FILE} with "
-            "PUSHOVER_TOKEN, PUSHOVER_USER and AI_API_KEY."
+            f"AI_API_KEY missing. Fill in {CONFIG_FILE} with AI_API_KEY."
+        )
+        sys.exit(1)
+    if not args.cli and not (PUSHOVER_TOKEN and PUSHOVER_USER):
+        logging.error(
+            f"PUSHOVER_TOKEN and PUSHOVER_USER missing. Fill in {CONFIG_FILE} "
+            "with them, or run with --cli to print notifications to the "
+            "terminal instead."
         )
         sys.exit(1)
     if AI_PROVIDER == "openai-compatible" and not AI_BASE_URL:
@@ -664,16 +693,26 @@ if __name__ == "__main__":
                 report_id = "COULD-NOT-SAVE"
                 report_path = None
 
+            delivery = "Printing alert to terminal." if args.cli else "Sending alert to Pushover."
             logging.info(
                 f"AI analysis completed. Report {report_id} saved at {report_path}. "
-                "Sending alert to Pushover."
+                f"{delivery}"
             )
             report_msg = (
                 f"Report ID: {report_id}\n\n"
                 f"Errors detected since the last run:\n\nAI Analysis:\n{ai_summary}"
             )
-            send_pushover("⚠️ Server Report: Errors Found", report_msg, priority=1)
+            send_pushover(
+                "⚠️ Server Report: Errors Found", report_msg,
+                priority=1, cli_mode=args.cli,
+            )
     else:
-        logging.info("No critical log lines found since last run. Sending OK notification.")
-        send_pushover("✅ Server Report: All OK", "No critical errors or security anomalies have been detected in the monitored logs since the last run.", priority=0)
+        delivery = "Printing OK notification to terminal." if args.cli else "Sending OK notification."
+        logging.info(f"No critical log lines found since last run. {delivery}")
+        send_pushover(
+            "✅ Server Report: All OK",
+            "No critical errors or security anomalies have been detected in the monitored logs since the last run.",
+            priority=0,
+            cli_mode=args.cli,
+        )
 

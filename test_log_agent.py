@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import importlib.util
+import io
 import json
 import os
 import re
@@ -375,6 +376,68 @@ class AIProviderTests(unittest.TestCase):
                 [{"role": "user", "content": "Analyze"}]
             )
         self.assertIsNone(result)
+
+
+class PushoverNotificationTests(unittest.TestCase):
+    """Tests for --cli mode: notifications print to stdout instead of Pushover."""
+
+    def setUp(self):
+        self.original = {
+            name: getattr(log_agent, name)
+            for name in ("SERVER_NAME", "PUSHOVER_TOKEN", "PUSHOVER_USER", "PUSHOVER_URL")
+        }
+        log_agent.SERVER_NAME = "testhost"
+
+    def tearDown(self):
+        for name, value in self.original.items():
+            setattr(log_agent, name, value)
+
+    def test_cli_mode_prints_notification_and_skips_the_api(self):
+        log_agent.PUSHOVER_TOKEN = "pushover-token"
+        log_agent.PUSHOVER_USER = "pushover-user"
+
+        with mock.patch.object(
+            log_agent.requests, "post",
+            side_effect=AssertionError("requests.post must not be called in CLI mode"),
+        ) as post_mock, mock.patch("sys.stdout", new_callable=io.StringIO) as fake_stdout:
+            log_agent.send_pushover(
+                "⚠️ Server Report: Errors Found",
+                "Report ID: 20261006T203040Z-ABC123\n\nAI Analysis:\nDisk error detected.",
+                priority=1,
+                cli_mode=True,
+            )
+
+        post_mock.assert_not_called()
+        output = fake_stdout.getvalue()
+        self.assertIn("Server Report: Errors Found [testhost]", output)
+        self.assertIn("priority 1", output)
+        self.assertIn("Report ID: 20261006T203040Z-ABC123", output)
+        self.assertIn("AI Analysis:", output)
+
+    def test_normal_mode_posts_the_notification_to_pushover(self):
+        log_agent.PUSHOVER_TOKEN = "pushover-token"
+        log_agent.PUSHOVER_USER = "pushover-user"
+        log_agent.PUSHOVER_URL = "https://api.pushover.net/1/messages.json"
+
+        captured = {}
+
+        def fake_post(url, data=None, headers=None, allow_redirects=False, timeout=None):
+            captured.update(
+                url=url, payload=data, headers=headers,
+                allow_redirects=allow_redirects, timeout=timeout,
+            )
+            return _FakeResponse(200, {"status": 1})
+
+        with mock.patch.object(log_agent.requests, "post", side_effect=fake_post):
+            log_agent.send_pushover("Test title", "Test message", priority=0)
+
+        self.assertEqual(captured["url"], "https://api.pushover.net/1/messages.json")
+        self.assertEqual(captured["payload"]["token"], "pushover-token")
+        self.assertEqual(captured["payload"]["user"], "pushover-user")
+        self.assertEqual(captured["payload"]["title"], "Test title [testhost]")
+        self.assertEqual(captured["payload"]["message"], "Test message")
+        self.assertEqual(captured["payload"]["priority"], 0)
+        self.assertEqual(captured["timeout"], 10)
 
 
 if __name__ == "__main__":
