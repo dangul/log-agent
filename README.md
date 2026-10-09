@@ -42,11 +42,19 @@ notification, and saves a timestamped JSON report for later review.
    chmod 600 log_agent.conf
    ```
 
-5. Run it once to verify, then add a cron job, e.g. every 10 minutes:
+5. Run it once to verify, then schedule it with cron. Using the system
+   crontab (`/etc/crontab`) is recommended, because the script must run as
+   root and the system crontab includes a user field. Edit it with
+   `sudo nano /etc/crontab` and add a line like this:
 
    ```sh
-   */10 * * * * /opt/log-agent/log_agent.py
+   # Daily report every morning at 06:30
+   30 6 * * * root /opt/log-agent/log_agent.py
    ```
+
+   Running the script once a day (instead of every few minutes) gives you a
+   daily report: a Pushover alert with the AI summary if critical lines were
+   found, or an "All OK" notification if the monitored logs were clean.
 
 ## Configuration reference
 
