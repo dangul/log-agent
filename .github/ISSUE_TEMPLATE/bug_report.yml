@@ -1,69 +1,62 @@
 name: Bug report
-description: Report a problem or unexpected behaviour in log-agent
+description: Report something that is not working as expected
 title: "[Bug]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for taking the time to report a bug! Please fill out the form below.
   - type: textarea
     id: description
     attributes:
       label: Description
-      description: What happened and what did you expect instead?
+      description: A clear and concise description of the bug.
+      placeholder: What happened?
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
       label: Steps to reproduce
-      description: How can the problem be reproduced?
+      description: How can we reproduce the issue?
       placeholder: |
-        1. Configure ...
-        2. Run ...
-        3. Observe ...
+        1. Run '...'
+        2. Use option '...'
+        3. See error
     validations:
       required: true
-  - type: dropdown
-    id: provider
+  - type: textarea
+    id: expected
     attributes:
-      label: AI provider
-      description: Which AI_PROVIDER are you using?
-      options:
-        - mammouth
-        - openai
-        - anthropic
-        - openai-compatible
-        - N/A (does not involve the AI)
+      label: Expected behavior
+      description: What did you expect to happen?
     validations:
       required: true
-  - type: input
-    id: python-version
-    attributes:
-      label: Python version
-      description: Output of `python3 --version`
-      placeholder: "3.11.4"
-  - type: input
-    id: os
-    attributes:
-      label: Operating system
-      description: e.g. Debian 12, Ubuntu 24.04
-      placeholder: "Debian 12"
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output
-      description: |
-        Paste the relevant lines from /var/log/log_agent.log or the error
-        message. Remove any personal/secret data (API keys, tokens, IPs).
+      label: Logs / error output
+      description: Paste any relevant logs or error messages. Please remove any sensitive information.
       render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Which version or commit are you using?
+      placeholder: e.g. v1.0.0 or commit hash
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, etc.
+      placeholder: e.g. Windows 11, Python 3.12
   - type: checkboxes
     id: checks
     attributes:
-      label: Before submitting
+      label: Checklist
       options:
-        - label: I have removed all sensitive data (API keys, tokens, IP addresses) from the report
+        - label: I have searched existing issues to make sure this is not a duplicate
           required: true
-        - label: I have searched the existing issues and this is not a duplicate
+        - label: I have removed any sensitive information (passwords, tokens, personal data) from this report
           required: true
