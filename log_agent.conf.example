@@ -119,6 +119,24 @@ LOG_SOURCES={
       "passwd(?:\\[|:).*password changed"
     ],
     "exclude_patterns": []
+  },
+  "/var/log/unifi/unifi.log": {
+    "patterns": [
+      "\\berror\\b",
+      "\\bcritical\\b",
+      "\\bfailed\\b",
+      "\\bfailure\\b",
+      "\\bunauthorized\\b",
+      "\\bblocked\\b",
+      "disconnect(ed)?",
+      "reboot(ed)?",
+      "unable to",
+      "authentication\\s+failure",
+      "wrong password",
+      "too many authentication failures",
+      "\\bpanic\\b"
+    ],
+    "exclude_patterns": []
   }
 }
 

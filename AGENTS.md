@@ -17,8 +17,10 @@ This repository contains a Python log-monitoring utility, `log_agent.py`, which 
 - Keep changes minimal and Pythonic. This project is intentionally compact and stateful; prefer surgical edits over broad refactors.
 - Preserve the behavior of saved offsets and inode tracking. New runs must only process newly appended log lines; `log_agent.pos` must remain consistent after restarts.
 - Keep secrets in `log_agent.conf` and do not hardcode API keys or tokens. The project expects the config file to be protected (root-owned, mode 600 in production).
+- Always create a pull request before merging any change into `main`. Do not commit directly to `main`; use a feature branch and merge only after the PR is open and the relevant checks pass.
 - When changing matching, filtering, parsing, or report-generation logic, update or add the corresponding regression tests in [test_log_agent.py](test_log_agent.py).
 - Prefer the repo’s existing patterns over introducing new dependencies or external state.
+- For release work, keep the release summary short and in English. A short description with a few bullets is preferred over a long narrative.
 
 ## Validation commands
 
