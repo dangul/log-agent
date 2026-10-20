@@ -100,7 +100,7 @@ valid JSON values are parsed automatically).
 | `PUSHOVER_USER` | Pushover user key |
 | `PUSHOVER_URL` | Pushover API endpoint (default is fine) |
 | `AI_PROVIDER` | `mammouth`, `openai`, `anthropic` or `openai-compatible` |
-| `AI_MODEL` | Model ID, e.g. `gpt-4.1`, `claude-sonnet-4-20250514`, `deepseek-chat` |
+| `AI_MODEL` | Model ID for the selected provider; default for Mammouth is `mammouth-recommended` (for example: `gpt-4.1`, `claude-sonnet-4-20250514`, `deepseek-chat`) |
 | `AI_API_KEY` | API key for the provider |
 | `AI_BASE_URL` | Optional base URL override (see defaults below) |
 | `AI_MAX_TOKENS` | Maximum number of tokens in the AI answer |

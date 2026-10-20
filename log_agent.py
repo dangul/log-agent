@@ -45,6 +45,13 @@ AI_PROVIDER_DEFAULTS = {
     "openai-compatible": "",
 }
 
+DEFAULT_MODEL_BY_PROVIDER = {
+    "mammouth": "mammouth-recommended",
+    "openai": "gpt-4.1",
+    "anthropic": "claude-sonnet-4-20250514",
+    "openai-compatible": "gpt-4.1",
+}
+
 # Diagnostic log written by this script itself.
 SERVER_NAME = socket.gethostname()
 
@@ -145,7 +152,9 @@ def _resolve_ai_settings(config):
     provider's built-in default (see AI_PROVIDER_DEFAULTS).
     """
     provider = str(config.get("AI_PROVIDER", "mammouth")).strip().lower()
-    model = config.get("AI_MODEL", "") or config.get("MODEL_NAME", "gpt-4.1")
+    model = config.get("AI_MODEL", "") or config.get("MODEL_NAME", "")
+    if not model:
+        model = DEFAULT_MODEL_BY_PROVIDER.get(provider, "gpt-4.1")
     api_key = config.get("AI_API_KEY", "") or config.get("MAMMOUTH_API_KEY", "")
 
     legacy_url = config.get("MAMMOUTH_URL", "") or ""

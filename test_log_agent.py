@@ -294,6 +294,16 @@ class AIProviderTests(unittest.TestCase):
         self.assertEqual(base_url, "https://api.mammouth.ai/v1")
         self.assertEqual(max_tokens, 300)
 
+    def test_resolve_ai_settings_uses_mammouth_recommended_by_default(self):
+        provider, model, api_key, base_url, max_tokens = log_agent._resolve_ai_settings(
+            {"AI_PROVIDER": "mammouth", "AI_API_KEY": "sk-mammouth"}
+        )
+        self.assertEqual(provider, "mammouth")
+        self.assertEqual(model, "mammouth-recommended")
+        self.assertEqual(api_key, "sk-mammouth")
+        self.assertEqual(base_url, "https://api.mammouth.ai/v1")
+        self.assertEqual(max_tokens, 300)
+
     def test_resolve_ai_settings_uses_built_in_provider_default_url(self):
         _, _, _, base_url, _ = log_agent._resolve_ai_settings(
             {"AI_PROVIDER": "anthropic", "AI_API_KEY": "sk-ant"}

@@ -60,9 +60,9 @@ PUSHOVER_URL="https://api.pushover.net/1/messages.json"
 # AI provider: mammouth | openai | anthropic | openai-compatible
 AI_PROVIDER=mammouth
 
-# Model ID offered by the provider, e.g. "gpt-4.1", "gpt-4o-mini",
-# "claude-sonnet-4-20250514", "deepseek-chat" or "llama3"
-AI_MODEL=gpt-4.1
+# Model ID offered by the provider. The default for Mammouth is
+# "mammouth-recommended"; other providers use their own defaults if left blank.
+AI_MODEL=mammouth-recommended
 
 # API key for the provider
 AI_API_KEY=""
