@@ -235,6 +235,13 @@ class ConfigFileTests(unittest.TestCase):
             log_agent.load_config("/nonexistent/log_agent.conf"), {}
         )
 
+    def test_default_log_sources_include_unifi(self):
+        unifi_source = log_agent.LOG_SOURCES.get("/var/log/unifi/unifi.log")
+        self.assertIsNotNone(unifi_source)
+        self.assertIn(r"\berror\b", unifi_source["patterns"])
+        self.assertIn(r"\bfailed\b", unifi_source["patterns"])
+        self.assertIn(r"disconnect(ed)?", unifi_source["patterns"])
+
 
 class _FakeResponse:
     """Minimal stand-in for a requests.Response in AI provider tests."""
@@ -413,14 +420,14 @@ class PushoverNotificationTests(unittest.TestCase):
             log_agent.send_pushover(
                 "⚠️ Server Report: Errors Found",
                 "Report ID: 20261006T203040Z-ABC123\n\nAI Analysis:\nDisk error detected.",
-                priority=1,
+                priority=0,
                 cli_mode=True,
             )
 
         post_mock.assert_not_called()
         output = fake_stdout.getvalue()
         self.assertIn("Server Report: Errors Found [testhost]", output)
-        self.assertIn("priority 1", output)
+        self.assertIn("priority 0", output)
         self.assertIn("Report ID: 20261006T203040Z-ABC123", output)
         self.assertIn("AI Analysis:", output)
 

@@ -221,6 +221,16 @@ LOG_SOURCES = _config.get("LOG_SOURCES", {
         ],
         "exclude_patterns": [],
     },
+    "/var/log/unifi/unifi.log": {
+        "patterns": [
+            r"\berror\b", r"\bcritical\b", r"\bfailed\b",
+            r"\bfailure\b", r"\bunauthorized\b", r"\bblocked\b",
+            r"disconnect(ed)?", r"reboot(ed)?", r"unable to",
+            r"authentication\s+failure", r"wrong password",
+            r"too many authentication failures", r"\bpanic\b",
+        ],
+        "exclude_patterns": [],
+    },
 })
 
 # Source file names, used to scope patterns in the exclude-patterns file.
@@ -713,7 +723,7 @@ if __name__ == "__main__":
             )
             send_pushover(
                 "⚠️ Server Report: Errors Found", report_msg,
-                priority=1, cli_mode=args.cli,
+                priority=0, cli_mode=args.cli,
             )
     else:
         delivery = "Printing OK notification to terminal." if args.cli else "Sending OK notification."
